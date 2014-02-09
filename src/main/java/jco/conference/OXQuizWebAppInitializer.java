@@ -1,14 +1,8 @@
 package jco.conference;
 
-import jco.conference.oxquiz.RepositoryConfig;
-import jco.conference.oxquiz.WebConfig;
-import jco.conference.oxquiz.WebSocketConfig;
-import jco.conference.oxquiz.security.AnonymousEntryAuthenticationFilter;
-import jco.conference.oxquiz.security.EmceeAuthenticationFilter;
-import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+public class OXQuizWebAppInitializer {}
 
-import javax.servlet.Filter;
-
+/*
 public class OXQuizWebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
     @Override
@@ -32,3 +26,4 @@ public class OXQuizWebAppInitializer extends AbstractAnnotationConfigDispatcherS
     }
 
 }
+*/
