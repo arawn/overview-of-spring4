@@ -3,6 +3,7 @@ package jco.conference.oxquiz;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.mvc.WebContentInterceptor;
@@ -12,6 +13,8 @@ import org.springframework.web.servlet.view.JstlView;
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = "jco.conference.oxquiz.web")
+@PropertySource("classpath:META-INF/properties/environment.xml")
+@PropertySource("classpath:META-INF/properties/environment.properties")
 public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Override

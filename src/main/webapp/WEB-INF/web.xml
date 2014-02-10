@@ -7,11 +7,9 @@
     <context-param>
         <param-name>configType</param-name>
 
-        <!-- OXQuizWebAppInitializer -->
+        <!-- value: Java -> OXQuizWebAppInitializer -->
+        <!-- value: GroovyDSL -> OXQuizWebAppInitializerWithGroovyDSL -->
         <param-value>Java</param-value>
-
-        <!-- OXQuizWebAppInitializerWithGroovyDSL -->
-        <!-- <param-value>GroovyDSL</param-value> -->
     </context-param>
 
 </web-app>

@@ -45,6 +45,15 @@
 </tbody>
 </table>
 <hr/>
+<sf:eval expression="@environment.getProperty('configType')" var="configType"/>
+<c:if test="${configType eq 'Java'}">
+<h3>App Environment</h3>
+<ul>
+    <li>AppName : <sf:eval expression="@environment.getProperty('appName')"/></li>
+    <li>AppVersion : <sf:eval expression="@environment.getProperty('appVersion')"/></li>
+</ul>
+<hr/>
+</c:if>
 <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <script type="text/javascript">
