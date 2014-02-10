@@ -1,6 +1,6 @@
 package jco.conference.oxquiz;
 
-import jco.conference.oxquiz.websocket.PlayerEventListener;
+import jco.conference.oxquiz.websocket.PlayersEventSender;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +26,8 @@ public class WebSocketConfig extends WebSocketMessageBrokerConfigurationSupport 
     }
 
     @Bean
-    public PlayerEventListener playerEventListener() {
-        return new PlayerEventListener();
+    public PlayersEventSender playersEventSender() {
+        return new PlayersEventSender();
     }
 
 }
