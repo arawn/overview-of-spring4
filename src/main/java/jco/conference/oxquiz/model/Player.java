@@ -1,11 +1,21 @@
 package jco.conference.oxquiz.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Player implements Principal {
 
     private final String name;
     private Boolean lastAnswer;
+
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime lastAnswerDateTime;
+
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    private LocalDate lastConnectionDate;
 
     public Player(String name) {
         this.name = name;
@@ -15,10 +25,38 @@ public class Player implements Principal {
         return name;
     }
     public Boolean getLastAnswer() { return lastAnswer; }
+    public LocalDateTime getLastAnswerDateTime() {
+        return lastAnswerDateTime;
+    }
+    public LocalDate getLastConnectionDate() {
+        return lastConnectionDate;
+    }
 
-    public void answerIsYes() { this.lastAnswer = true; }
-    public void answerIsNo() { this.lastAnswer = false; }
-    public void answerIsNothing() { this.lastAnswer = null; }
+    public Player connect() {
+        this.lastConnectionDate = LocalDate.now();
+
+        return this;
+    }
+
+    public Player disconnect() {
+        this.answerIsNothing();
+
+        return this;
+    }
+
+    public void answerIsYes() {
+        this.lastAnswer = true;
+        this.lastAnswerDateTime = LocalDateTime.now();
+    }
+    public void answerIsNo() {
+        this.lastAnswer = false;
+        this.lastAnswerDateTime = LocalDateTime.now();
+    }
+    public void answerIsNothing() {
+        this.lastAnswer = null;
+        this.lastAnswerDateTime = null;
+    }
+
 
     @Override
     public boolean equals(Object o) {

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="sf" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -23,6 +24,26 @@
 출제할 문제 : <input id="txtQuestion" type="text" size="100"/> <button id="btnSend">문제 보내기</button>
 <hr/>
 <button id="btnClose">문제 종료</button>
+<hr/>
+<h3>플레이어 목록</h3>
+<table>
+<thead>
+    <tr>
+        <th>이름</th>
+        <th>마지막 답변시간</th>
+        <th>마지막 접속일</th>
+    </tr>
+</thead>
+<tbody>
+<c:forEach items="${players}" var="player">
+    <tr>
+        <td>${player.name}</td>
+        <td><sf:eval expression="player.lastAnswerDateTime"/></td>
+        <td><sf:eval expression="player.lastConnectionDate"/></td>
+    </tr>
+</c:forEach>
+</tbody>
+</table>
 <hr/>
 <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
