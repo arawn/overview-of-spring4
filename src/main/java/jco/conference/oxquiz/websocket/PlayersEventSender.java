@@ -17,30 +17,19 @@ public class PlayersEventSender implements InitializingBean {
     private SimpMessageSendingOperations messagingTemplate;
     private PlayerRepository playerRepository;
 
-    @Around("execution(* org.springframework.web.socket.WebSocketHandler.afterConnectionEstablished(..))")
-    public Object publishPlayerInEvent(ProceedingJoinPoint thisJoinPoint) throws Throwable {
-        Object retVal = thisJoinPoint.proceed();
 
-        WebSocketSession session = (WebSocketSession) thisJoinPoint.getArgs()[0];
+    public void publishPlayerInEvent(WebSocketSession session) {
         PlayerEvent event = PlayerEvent.connected(session);
 
         playerRepository.save(event.getPlayer());
         messagingTemplate.convertAndSend("/quiz/players/in", event.getPlayer());
-
-        return retVal;
     }
 
-    @Around("execution(* org.springframework.web.socket.WebSocketHandler.afterConnectionClosed(..))")
-    public Object publishPlayerOutEvent(ProceedingJoinPoint thisJoinPoint) throws Throwable {
-        Object retVal = thisJoinPoint.proceed();
-
-        WebSocketSession session = (WebSocketSession) thisJoinPoint.getArgs()[0];
+    public void publishPlayerOutEvent(WebSocketSession session) {
         PlayerEvent event = PlayerEvent.disconnected(session);
 
         playerRepository.remove(event.getPlayer());
         messagingTemplate.convertAndSend("/quiz/players/out", event.getPlayer());
-
-        return retVal;
     }
 
     @Autowired
@@ -59,6 +48,20 @@ public class PlayersEventSender implements InitializingBean {
         Assert.notNull(this.playerRepository);
     }
 
+
+    @Around("execution(* org.springframework.web.socket.WebSocketHandler.afterConnectionEstablished(..))")
+    public Object publishPlayerInEvent(ProceedingJoinPoint thisJoinPoint) throws Throwable {
+        Object retVal = thisJoinPoint.proceed();
+        publishPlayerInEvent((WebSocketSession) thisJoinPoint.getArgs()[0]);
+        return retVal;
+    }
+
+    @Around("execution(* org.springframework.web.socket.WebSocketHandler.afterConnectionClosed(..))")
+    public Object publishPlayerOutEvent(ProceedingJoinPoint thisJoinPoint) throws Throwable {
+        Object retVal = thisJoinPoint.proceed();
+        publishPlayerOutEvent((WebSocketSession) thisJoinPoint.getArgs()[0]);
+        return retVal;
+    }
 
     static enum PlayerEventType { CONNECTED, DISCONNECTED }
     static class PlayerEvent {

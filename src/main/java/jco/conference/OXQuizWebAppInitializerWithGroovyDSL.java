@@ -10,9 +10,18 @@ import org.springframework.web.context.support.AbstractRefreshableWebApplication
 import org.springframework.web.servlet.support.AbstractDispatcherServletInitializer;
 
 import javax.servlet.Filter;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import java.io.IOException;
 
 public class OXQuizWebAppInitializerWithGroovyDSL extends AbstractDispatcherServletInitializer {
+
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        if("GroovyDSL".equals(servletContext.getInitParameter("configType"))) {
+            super.onStartup(servletContext);
+        }
+    }
 
     @Override
     protected WebApplicationContext createRootApplicationContext() {

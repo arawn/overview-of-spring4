@@ -1,9 +1,24 @@
 package jco.conference;
 
-public class OXQuizWebAppInitializer {}
+import jco.conference.oxquiz.RepositoryConfig;
+import jco.conference.oxquiz.WebConfig;
+import jco.conference.oxquiz.WebSocketConfig;
+import jco.conference.oxquiz.security.AnonymousEntryAuthenticationFilter;
+import jco.conference.oxquiz.security.EmceeAuthenticationFilter;
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
-/*
+import javax.servlet.Filter;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+
 public class OXQuizWebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        if("Java".equals(servletContext.getInitParameter("configType"))) {
+            super.onStartup(servletContext);
+        }
+    }
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
@@ -26,4 +41,3 @@ public class OXQuizWebAppInitializer extends AbstractAnnotationConfigDispatcherS
     }
 
 }
-*/
