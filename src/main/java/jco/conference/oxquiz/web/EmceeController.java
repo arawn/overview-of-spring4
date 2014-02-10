@@ -1,6 +1,7 @@
 package jco.conference.oxquiz.web;
 
-import jco.conference.oxquiz.model.repository.PlayerRepository;
+import jco.conference.oxquiz.model.Player;
+import jco.conference.oxquiz.model.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +20,10 @@ import java.util.Map;
 public class EmceeController {
 
     private SimpMessageSendingOperations messagingTemplate;
-    private PlayerRepository playerRepository;
+    private Repository<Player> playerRepository;
 
     @Autowired
-    public EmceeController(SimpMessageSendingOperations messagingTemplate, PlayerRepository playerRepository) {
+    public EmceeController(SimpMessageSendingOperations messagingTemplate, Repository<Player> playerRepository) {
         this.messagingTemplate = messagingTemplate;
         this.playerRepository = playerRepository;
     }

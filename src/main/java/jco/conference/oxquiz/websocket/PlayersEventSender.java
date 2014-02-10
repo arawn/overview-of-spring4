@@ -1,7 +1,7 @@
 package jco.conference.oxquiz.websocket;
 
 import jco.conference.oxquiz.model.Player;
-import jco.conference.oxquiz.model.repository.PlayerRepository;
+import jco.conference.oxquiz.model.repository.Repository;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,7 +15,7 @@ import org.springframework.web.socket.WebSocketSession;
 public class PlayersEventSender implements InitializingBean {
 
     private SimpMessageSendingOperations messagingTemplate;
-    private PlayerRepository playerRepository;
+    private Repository<Player> playerRepository;
 
 
     public void publishPlayerInEvent(WebSocketSession session) {
@@ -38,7 +38,7 @@ public class PlayersEventSender implements InitializingBean {
     }
 
     @Autowired
-    public void setPlayerRepository(PlayerRepository playerRepository) {
+    public void setPlayerRepository(Repository<Player> playerRepository) {
         this.playerRepository = playerRepository;
     }
 

@@ -1,7 +1,7 @@
 package jco.conference.oxquiz.websocket;
 
 import jco.conference.oxquiz.model.Player;
-import jco.conference.oxquiz.model.repository.PlayerRepository;
+import jco.conference.oxquiz.model.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -12,10 +12,10 @@ import org.springframework.stereotype.Controller;
 public class PlayerController {
 
     private SimpMessageSendingOperations messagingTemplate;
-    private PlayerRepository playerRepository;
+    private Repository<Player> playerRepository;
 
     @Autowired
-    public PlayerController(SimpMessageSendingOperations messagingTemplate, PlayerRepository playerRepository) {
+    public PlayerController(SimpMessageSendingOperations messagingTemplate, Repository<Player> playerRepository) {
         this.messagingTemplate = messagingTemplate;
         this.playerRepository = playerRepository;
     }
