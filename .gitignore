@@ -3,6 +3,7 @@
 build
 
 # idea
+.idea
 *.iml
 *.ipr
 *.iws
