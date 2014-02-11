@@ -7,28 +7,17 @@
 <body>
     <div id="container">
         <header>
-            <h2>곧 문제가 출제됩니다. 잠시만 기다려주세요. diq!</h2>
+            <h2 id="question">곧 문제가 출제됩니다. 잠시만 기다려주세요.</h2>
         </header>
 
         <div id="main">
             <div id="yes">
                 <div class="background">O</div>
-                <div class="respondents">
-                    <ul id="yesPlayers"></ul>
-                </div>
             </div>
             <div id="no">
                 <div class="background">X</div>
-                <div class="respondents">
-                    <ul id="noPlayers"></ul>
-                </div>
             </div>
         </div>
-
-        <footer>
-            <div>답변 대기중인 사람들(<span id="watingNum">0</span>) : </div>
-            <ul id="waiting"/>
-        </footer>
     </div>
 
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
@@ -36,31 +25,6 @@
     <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
     <script src="/resources/js/stomp.min.js"></script>
     <script type="text/javascript">
-        var Player = function() {
-            var yesPlayers = $('#yesPlayers');
-            var noPlayers = $('#noPlayers');
-            var waiting = $('#waiting');
-
-            return {
-                in: function(player) {
-                    if(player.lastAnswer === true) {
-                        yesPlayers.append('<li class="' + player.name + '"/>');
-                    } else if(player.lastAnswer === false) {
-                        noPlayers.append('<li class="' + player.name + '"/>');
-                    } else {
-                        waiting.append('<li class="' + player.name + '">' + player.name + '</li>');
-                    }
-                },
-                out: function(player) {
-                    $('li.' + player.name).remove();
-                },
-                move: function(player) {
-                    this.out(player);
-                    this.in(player);
-                }
-            }
-        }();
-
         (function() {
             var socket = new SockJS('/join');
             var stompClient = Stomp.over(socket);
@@ -69,44 +33,12 @@
                 console.log('Connected ' + frame);
                 console.log(frame);
 
-                var yesPlayers = $('#yesPlayers');
-                var noPlayers = $('#noPlayers');
-                var waiting = $('#waiting');
-
-                // 플레리어 목록 받아오기
-                stompClient.subscribe("/quiz/players", function(message) {
-                    console.log(message);
-
-                    var players = JSON.parse(message.body);
-                    $(players).each(function(idx, player) {
-                        Player.in(player);
-                    });
-                });
-
-                // 새로운 플레이어 참가
-                stompClient.subscribe("/quiz/players/in", function(message) {
-                    console.log(message);
-
-                    Player.in(JSON.parse(message.body));
-                });
-
-                // 플레이어 나감
-                stompClient.subscribe("/quiz/players/out", function(message) {
-                    console.log(message);
-
-                    Player.out(JSON.parse(message.body));
-                });
-
-                // 플레이어가 대답함
-                stompClient.subscribe("/quiz/players/answer", function(message) {
-                    console.log(message);
-
-                    Player.move(JSON.parse(message.body));
-                });
-
                 // 새로운 문제 수신
                 stompClient.subscribe("/quiz/question/reception", function(message) {
                     console.log(message);
+
+                    var data = JSON.parse(message.body);
+                    $('#question').html(data.question);
                 });
 
                 // 문제 종료

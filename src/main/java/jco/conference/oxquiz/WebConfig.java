@@ -25,6 +25,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("redirect:/oxquiz.html");
+        registry.addViewController("/observer").setViewName("redirect:/observer.html");
     }
 
     @Override
