@@ -8,3 +8,6 @@ build
 *.ipr
 *.iws
 out
+
+#bower
+src/main/webapp/resources/components/
