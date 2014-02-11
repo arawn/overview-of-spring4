@@ -45,6 +45,11 @@ public class OXQuizWebAppInitializerWithGroovyDSL extends AbstractDispatcherServ
     }
 
     @Override
+    protected String getServletName() {
+        return OXQuizWebAppInitializerWithGroovyDSL.class.getSimpleName();
+    }
+
+    @Override
     protected Filter[] getServletFilters() {
         return new Filter[]{ new AnonymousEntryAuthenticationFilter(), new EmceeAuthenticationFilter() };
     }

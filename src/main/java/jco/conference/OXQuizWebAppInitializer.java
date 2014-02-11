@@ -36,6 +36,11 @@ public class OXQuizWebAppInitializer extends AbstractAnnotationConfigDispatcherS
     }
 
     @Override
+    protected String getServletName() {
+        return OXQuizWebAppInitializer.class.getSimpleName();
+    }
+
+    @Override
     protected Filter[] getServletFilters() {
         return new Filter[]{ new AnonymousEntryAuthenticationFilter(), new EmceeAuthenticationFilter() };
     }

@@ -74,7 +74,9 @@ dependencies {
 
     compile "javax.servlet:jstl:1.2"
     providedCompile "org.apache.tomcat:tomcat-servlet-api:$versions.tomcat",
-                    "org.apache.tomcat:tomcat-jsp-api:$versions.tomcat"
+                    "org.apache.tomcat:tomcat-jsp-api:$versions.tomcat",
+                    "org.apache.tomcat:tomcat-websocket-api:$versions.tomcat"
+
 
     testCompile "org.springframework:spring-test:$versions.spring",
                 "org.spockframework:spock-spring:$versions.springSpock",
