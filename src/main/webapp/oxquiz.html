@@ -5,26 +5,26 @@
   <link rel="stylesheet" type="text/css" href='/resources/css/style.css'/>
 </head>
 <body>
-  <div id="container">
-    <header>
-      <h2 id="question">곧 문제가 출제됩니다. 잠시만 기다려주세요.</h2>
-    </header>
+  <header>
+    <h2 id="question">곧 문제가 출제됩니다. 잠시만 기다려주세요.</h2>
+  </header>
 
-    <div id="main">
-      <div id="yes">
-        <div class="background">O</div>
+  <div id="main">
+    <div id="answer">
+      <div class="half">
+        <div id="yes">YES</div>
       </div>
-      <div id="no">
-        <div class="background">X</div>
+      <div class="half">
+        <div id="no">NO</div>
       </div>
     </div>
   </div>
 
   <script src="/resources/components/jquery/jquery.js"></script>
   <script src="/resources/components/sockjs/sockjs.js"></script>
-  <script src="resources/components/stomp-websocket/lib/stomp.js"></script>
+  <script src="/resources/components/stomp-websocket/lib/stomp.js"></script>
   <script type="text/javascript">
-    (function() {
+    $(document).ready(function() {
       var socket = new SockJS('/join');
       var stompClient = Stomp.over(socket);
 
@@ -48,13 +48,25 @@
         console.log("STOMP protocol error " + error);
       });
 
+      var lastAnswer = null;
+
       $('#yes').click(function() {
-        stompClient.send('/quiz/answer', {}, JSON.stringify({answer: true}));
-      }).css('cursor', 'pointer');
+        if (lastAnswer !== true) {
+          stompClient.send('/quiz/answer', {}, JSON.stringify({answer: true}));
+          lastAnswer = true;
+          $('#yes').addClass('active');
+          $('#no').removeClass('active');
+        }
+      });
       $('#no').click(function() {
-        stompClient.send('/quiz/answer', {}, JSON.stringify({answer: false}));
-      }).css('cursor', 'pointer');
-    })();
+        if (lastAnswer !== false) {
+          stompClient.send('/quiz/answer', {}, JSON.stringify({answer: false}));
+          lastAnswer = false;
+          $('#no').addClass('active');
+          $('#yes').removeClass('active');
+        }
+      });
+    });
   </script>
 </body>
 </html>
