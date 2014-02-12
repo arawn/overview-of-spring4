@@ -1,126 +1,314 @@
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Overview of Spring 4.0 :: OXQuiz</title>
-    <link rel="stylesheet" type="text/css" href='/resources/css/style.css'/>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <title>Overview of Spring 4.0 :: OXQuiz</title>
+  <link rel="stylesheet" type="text/css" href='/resources/css/style.css'/>
 </head>
 <body>
-    <div id="container">
-        <header>
-            <h2 id="question">곧 문제가 출제됩니다. 잠시만 기다려주세요.</h2>
-        </header>
 
-        <div id="main">
-            <div id="yes">
-                <div class="background">O</div>
-                <div class="respondents">
-                    <ul id="yesPlayers"></ul>
-                </div>
-            </div>
-            <div id="no">
-                <div class="background">X</div>
-                <div class="respondents">
-                    <ul id="noPlayers"></ul>
-                </div>
-            </div>
-        </div>
+  <header>
+    <h2 id="question">곧 문제가 출제됩니다. 잠시만 기다려주세요.</h2>
+  </header>
 
-        <footer>
-            <div>답변 대기중인 사람들(<span id="watingNum">0</span>) : </div>
-            <ul id="waiting"/>
-        </footer>
+  <div id="main">
+    <div id="label">
+      <div class="half">
+        <div id="yes">YES</div>
+      </div>
+      <div class="half">
+        <div id="no">NO</div>
+      </div>
     </div>
+    <div id="playground">
+      <div class="half">
+        <div id="yes-area"></div>
+      </div>
+      <div class="half">
+        <div id="no-area"></div>
+      </div>
+    </div>
+    <div id="graph">
+      <span id="graph-yes"></span>
+    </div>
+    <footer>
+      <h3>답변 대기중인 사람들(<span id="waitingNum">0</span>) : </h3>
+      <div id="waiting">
+      </div>
+    </footer>
+  </div>
 
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-    <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
-    <script src="/resources/js/stomp.min.js"></script>
-    <script type="text/javascript">
-        var Player = function() {
-            var yesPlayers = $('#yesPlayers');
-            var noPlayers = $('#noPlayers');
-            var waiting = $('#waiting');
+  <div id="preloadedImages"></div>
 
-            return {
-                in: function(player) {
-                    if(player.lastAnswer === true) {
-                        yesPlayers.append('<li class="' + player.name + '"/>');
-                    } else if(player.lastAnswer === false) {
-                        noPlayers.append('<li class="' + player.name + '"/>');
-                    } else {
-                        waiting.append('<li class="' + player.name + '">' + player.name + '</li>');
-                    }
-                },
-                out: function(player) {
-                    $('li.' + player.name).remove();
-                },
-                move: function(player) {
-                    this.out(player);
-                    this.in(player);
-                }
-            }
-        }();
+  <script src="/resources/components/jquery/jquery.js"></script>
+  <script src="/resources/components/sockjs/sockjs.js"></script>
+  <script src="/resources/components/stomp-websocket/lib/stomp.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
 
-        (function() {
-            var socket = new SockJS('/join');
-            var stompClient = Stomp.over(socket);
 
-            stompClient.connect(' ', ' ', function(frame) {
-                console.log('Connected ' + frame);
-                console.log(frame);
+      var yesArea$ = $('#yes-area'),
+          noArea$ = $('#no-area'),
+          yesAreaLeft = Math.ceil(yesArea$.offset().left),
+          yesAreaRight = yesAreaLeft + yesArea$.width() - 30,
+          yesAreaTop = Math.ceil(yesArea$.offset().top),
+          yesAreaBottom = yesAreaTop + yesArea$.height() - 80,
+          noAreaLeft = Math.ceil(noArea$.offset().left),
+          noAreaRight = noAreaLeft + noArea$.width() - 30,
+          noAreaTop = Math.ceil(noArea$.offset().top),
+          noAreaBottom = noAreaTop + noArea$.height() - 80;
 
-                var yesPlayers = $('#yesPlayers');
-                var noPlayers = $('#noPlayers');
-                var waiting = $('#waiting');
+      function getRandomPositionInYesArea() {
+        return {
+            top: Math.floor(Math.random() * (yesAreaBottom - yesAreaTop + 1)) + yesAreaTop,
+            left: Math.floor(Math.random() * (yesAreaRight - yesAreaLeft + 1)) + yesAreaLeft
+          };
+      }
 
-                // 플레리어 목록 받아오기
-                stompClient.subscribe("/quiz/players", function(message) {
-                    console.log(message);
+      function getRandomPositionInNoArea() {
+        return {
+            top: Math.floor(Math.random() * (noAreaBottom - noAreaTop + 1)) + noAreaTop,
+            left: Math.floor(Math.random() * (noAreaRight - noAreaLeft + 1)) + noAreaLeft
+          };
+      }
 
-                    var players = JSON.parse(message.body);
-                    $(players).each(function(idx, player) {
-                        Player.in(player);
-                    });
-                });
+      function getRandomAvatar() {
+        return Math.floor(Math.random() * (120)) + 1;
+      }
 
-                // 새로운 플레이어 참가
-                stompClient.subscribe("/quiz/players/in", function(message) {
-                    console.log(message);
+      var totalPlayer = 0,
+          waitCount = 0,
+          yesCount = 0,
+          waiting$ = $('#waiting'),
+          graph$ = $('#graph-yes'),
+          waitingNum$ = $('#waitingNum'),
+          question$ = $('#question');
 
-                    Player.in(JSON.parse(message.body));
-                });
+      function addPlayer(player) {
+        totalPlayer++;
+        waitCount++;
+        waitingNum$.html(waitCount);
+        waiting$.append(
+          $('<img>').attr({src: '/resources/icons/' + getRandomAvatar() + '.gif', id:player.name}).addClass('player')
+        );
+      }
 
-                // 플레이어 나감
-                stompClient.subscribe("/quiz/players/out", function(message) {
-                    console.log(message);
+      function removePlayer(player) {
+        totalPlayer--;
+        var p$ = $('#' + player.name);
+        if (p$.hasClass('answered')) { waitCount--; waitingNum$.html(waitCount);}
+        $('#' + player.name).remove();
+      }
 
-                    Player.out(JSON.parse(message.body));
-                });
+      function moveToYesNoArea(player) {
+        var p$ = $('#' + player.name);
+        if (p$.length) {
+          var fromWaiting = false;
+          if (!p$.hasClass('answered')) {
+            waitCount--;
+            waitingNum$.html(waitCount);
+            p$.addClass('answered')
+              .offset(p$.offset());
+            fromWaiting = true;
+          }
 
-                // 플레이어가 대답함
-                stompClient.subscribe("/quiz/players/answer", function(message) {
-                    console.log(message);
+          if(player.lastAnswer === true) {
+            yesCount++;
+            p$.animate(getRandomPositionInYesArea());
+          } else if(player.lastAnswer === false) {
+            if (!fromWaiting) { yesCount--; }
+            p$.animate(getRandomPositionInNoArea());
+          }
+        }
 
-                    Player.move(JSON.parse(message.body));
-                });
+        var yesPercentage = Math.round(yesCount / (totalPlayer - waitCount) * 100);
+        graph$.animate({width: yesPercentage + '%'});
+      }
 
-                // 새로운 문제 수신
-                stompClient.subscribe("/quiz/question/reception", function(message) {
-                    console.log(message);
+      // 웹소켓 연결
+      var socket = new SockJS('/join'),
+          stompClient = Stomp.over(socket);
 
-                    var data = JSON.parse(message.body);
-                    $('#question').html(data.question);
-                });
+      stompClient.connect(' ', ' ', function(frame) {
+        console.log('Connected ' + frame);
+        console.log(frame);
 
-                // 문제 종료
-                stompClient.subscribe("/quiz/question/close", function(message) {
-                    console.log(message);
-                });
-            }, function (error) {
-                console.log("STOMP protocol error " + error);
-            });
-        })();
-</script>
+        // 플레이어 목록 받아오기
+        stompClient.subscribe("/quiz/players", function(message) {
+          console.log(message);
 
+          var players = JSON.parse(message.body);
+          $(players).each(function(idx, player) {
+            addPlayer(player);
+          });
+        });
+
+        // 새로운 플레이어 참가
+        stompClient.subscribe("/quiz/players/in", function(message) {
+          console.log(message);
+
+          addPlayer(JSON.parse(message.body));
+          //Player.in(JSON.parse(message.body));
+        });
+
+        // 플레이어 나감
+        stompClient.subscribe("/quiz/players/out", function(message) {
+          console.log(message);
+
+          removePlayer(JSON.parse(message.body))
+          //Player.out(JSON.parse(message.body));
+        });
+
+        // 플레이어가 대답함
+        stompClient.subscribe("/quiz/players/answer", function(message) {
+          console.log(message);
+
+          moveToYesNoArea(JSON.parse(message.body));
+          //Player.move(JSON.parse(message.body));
+        });
+
+        // 새로운 문제 수신
+        stompClient.subscribe("/quiz/question/reception", function(message) {
+          console.log(message);
+
+          var data = JSON.parse(message.body);
+          question$.html(data.question);
+        });
+
+        // 문제 종료
+        stompClient.subscribe("/quiz/question/close", function(message) {
+          console.log(message);
+        });
+      }, function (error) {
+          console.log("STOMP protocol error " + error);
+      });
+    });
+
+    // prefetch images
+    /* icons from
+       http://all-free-download.com/free-vector/vector-cartoon/pixel_art_of_the_cartoon_01_vector_180945.html
+       http://all-free-download.com/free-vector/vector-cartoon/pixel_art_of_the_cartoon_02_vector_180944.html
+       http://all-free-download.com/free-vector/vector-cartoon/pixel_art_of_the_cartoon_03_vector_180943.html
+    */
+    (new Image()).src = '/resources/icons/1.gif';
+    (new Image()).src = '/resources/icons/2.gif';
+    (new Image()).src = '/resources/icons/3.gif';
+    (new Image()).src = '/resources/icons/4.gif';
+    (new Image()).src = '/resources/icons/5.gif';
+    (new Image()).src = '/resources/icons/6.gif';
+    (new Image()).src = '/resources/icons/7.gif';
+    (new Image()).src = '/resources/icons/8.gif';
+    (new Image()).src = '/resources/icons/9.gif';
+    (new Image()).src = '/resources/icons/10.gif';
+    (new Image()).src = '/resources/icons/11.gif';
+    (new Image()).src = '/resources/icons/12.gif';
+    (new Image()).src = '/resources/icons/13.gif';
+    (new Image()).src = '/resources/icons/14.gif';
+    (new Image()).src = '/resources/icons/15.gif';
+    (new Image()).src = '/resources/icons/16.gif';
+    (new Image()).src = '/resources/icons/17.gif';
+    (new Image()).src = '/resources/icons/18.gif';
+    (new Image()).src = '/resources/icons/19.gif';
+    (new Image()).src = '/resources/icons/20.gif';
+    (new Image()).src = '/resources/icons/21.gif';
+    (new Image()).src = '/resources/icons/22.gif';
+    (new Image()).src = '/resources/icons/23.gif';
+    (new Image()).src = '/resources/icons/24.gif';
+    (new Image()).src = '/resources/icons/25.gif';
+    (new Image()).src = '/resources/icons/26.gif';
+    (new Image()).src = '/resources/icons/27.gif';
+    (new Image()).src = '/resources/icons/28.gif';
+    (new Image()).src = '/resources/icons/29.gif';
+    (new Image()).src = '/resources/icons/30.gif';
+    (new Image()).src = '/resources/icons/31.gif';
+    (new Image()).src = '/resources/icons/32.gif';
+    (new Image()).src = '/resources/icons/33.gif';
+    (new Image()).src = '/resources/icons/34.gif';
+    (new Image()).src = '/resources/icons/35.gif';
+    (new Image()).src = '/resources/icons/36.gif';
+    (new Image()).src = '/resources/icons/37.gif';
+    (new Image()).src = '/resources/icons/38.gif';
+    (new Image()).src = '/resources/icons/39.gif';
+    (new Image()).src = '/resources/icons/40.gif';
+    (new Image()).src = '/resources/icons/41.gif';
+    (new Image()).src = '/resources/icons/42.gif';
+    (new Image()).src = '/resources/icons/43.gif';
+    (new Image()).src = '/resources/icons/44.gif';
+    (new Image()).src = '/resources/icons/45.gif';
+    (new Image()).src = '/resources/icons/46.gif';
+    (new Image()).src = '/resources/icons/47.gif';
+    (new Image()).src = '/resources/icons/48.gif';
+    (new Image()).src = '/resources/icons/49.gif';
+    (new Image()).src = '/resources/icons/50.gif';
+    (new Image()).src = '/resources/icons/51.gif';
+    (new Image()).src = '/resources/icons/52.gif';
+    (new Image()).src = '/resources/icons/53.gif';
+    (new Image()).src = '/resources/icons/54.gif';
+    (new Image()).src = '/resources/icons/55.gif';
+    (new Image()).src = '/resources/icons/56.gif';
+    (new Image()).src = '/resources/icons/57.gif';
+    (new Image()).src = '/resources/icons/58.gif';
+    (new Image()).src = '/resources/icons/59.gif';
+    (new Image()).src = '/resources/icons/60.gif';
+    (new Image()).src = '/resources/icons/61.gif';
+    (new Image()).src = '/resources/icons/62.gif';
+    (new Image()).src = '/resources/icons/63.gif';
+    (new Image()).src = '/resources/icons/64.gif';
+    (new Image()).src = '/resources/icons/65.gif';
+    (new Image()).src = '/resources/icons/66.gif';
+    (new Image()).src = '/resources/icons/67.gif';
+    (new Image()).src = '/resources/icons/68.gif';
+    (new Image()).src = '/resources/icons/69.gif';
+    (new Image()).src = '/resources/icons/70.gif';
+    (new Image()).src = '/resources/icons/71.gif';
+    (new Image()).src = '/resources/icons/72.gif';
+    (new Image()).src = '/resources/icons/73.gif';
+    (new Image()).src = '/resources/icons/74.gif';
+    (new Image()).src = '/resources/icons/75.gif';
+    (new Image()).src = '/resources/icons/76.gif';
+    (new Image()).src = '/resources/icons/77.gif';
+    (new Image()).src = '/resources/icons/78.gif';
+    (new Image()).src = '/resources/icons/79.gif';
+    (new Image()).src = '/resources/icons/80.gif';
+    (new Image()).src = '/resources/icons/81.gif';
+    (new Image()).src = '/resources/icons/82.gif';
+    (new Image()).src = '/resources/icons/83.gif';
+    (new Image()).src = '/resources/icons/84.gif';
+    (new Image()).src = '/resources/icons/85.gif';
+    (new Image()).src = '/resources/icons/86.gif';
+    (new Image()).src = '/resources/icons/87.gif';
+    (new Image()).src = '/resources/icons/88.gif';
+    (new Image()).src = '/resources/icons/89.gif';
+    (new Image()).src = '/resources/icons/90.gif';
+    (new Image()).src = '/resources/icons/91.gif';
+    (new Image()).src = '/resources/icons/92.gif';
+    (new Image()).src = '/resources/icons/93.gif';
+    (new Image()).src = '/resources/icons/94.gif';
+    (new Image()).src = '/resources/icons/95.gif';
+    (new Image()).src = '/resources/icons/96.gif';
+    (new Image()).src = '/resources/icons/97.gif';
+    (new Image()).src = '/resources/icons/98.gif';
+    (new Image()).src = '/resources/icons/99.gif';
+    (new Image()).src = '/resources/icons/100.gif';
+    (new Image()).src = '/resources/icons/101.gif';
+    (new Image()).src = '/resources/icons/102.gif';
+    (new Image()).src = '/resources/icons/103.gif';
+    (new Image()).src = '/resources/icons/104.gif';
+    (new Image()).src = '/resources/icons/105.gif';
+    (new Image()).src = '/resources/icons/106.gif';
+    (new Image()).src = '/resources/icons/107.gif';
+    (new Image()).src = '/resources/icons/108.gif';
+    (new Image()).src = '/resources/icons/109.gif';
+    (new Image()).src = '/resources/icons/110.gif';
+    (new Image()).src = '/resources/icons/111.gif';
+    (new Image()).src = '/resources/icons/112.gif';
+    (new Image()).src = '/resources/icons/113.gif';
+    (new Image()).src = '/resources/icons/114.gif';
+    (new Image()).src = '/resources/icons/115.gif';
+    (new Image()).src = '/resources/icons/116.gif';
+    (new Image()).src = '/resources/icons/117.gif';
+    (new Image()).src = '/resources/icons/118.gif';
+    (new Image()).src = '/resources/icons/119.gif';
+    (new Image()).src = '/resources/icons/120.gif';
+  </script>
 </body>
 </html>

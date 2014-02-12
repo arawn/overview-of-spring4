@@ -1,62 +1,72 @@
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Overview of Spring 4.0 :: OXQuiz</title>
-    <link rel="stylesheet" type="text/css" href='/resources/css/style.css'/>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <title>Overview of Spring 4.0 :: OXQuiz</title>
+  <link rel="stylesheet" type="text/css" href='/resources/css/style.css'/>
 </head>
 <body>
-    <div id="container">
-        <header>
-            <h2 id="question">곧 문제가 출제됩니다. 잠시만 기다려주세요.</h2>
-        </header>
+  <header>
+    <h2 id="question">곧 문제가 출제됩니다. 잠시만 기다려주세요.</h2>
+  </header>
 
-        <div id="main">
-            <div id="yes">
-                <div class="background">O</div>
-            </div>
-            <div id="no">
-                <div class="background">X</div>
-            </div>
-        </div>
+  <div id="main">
+    <div id="answer">
+      <div class="half">
+        <div id="yes">YES</div>
+      </div>
+      <div class="half">
+        <div id="no">NO</div>
+      </div>
     </div>
+  </div>
 
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-    <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
-    <script src="/resources/js/stomp.min.js"></script>
-    <script type="text/javascript">
-        (function() {
-            var socket = new SockJS('/join');
-            var stompClient = Stomp.over(socket);
+  <script src="/resources/components/jquery/jquery.js"></script>
+  <script src="/resources/components/sockjs/sockjs.js"></script>
+  <script src="/resources/components/stomp-websocket/lib/stomp.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var socket = new SockJS('/join');
+      var stompClient = Stomp.over(socket);
 
-            stompClient.connect(' ', ' ', function(frame) {
-                console.log('Connected ' + frame);
-                console.log(frame);
+      stompClient.connect(' ', ' ', function(frame) {
+        console.log('Connected ' + frame);
+        console.log(frame);
 
-                // 새로운 문제 수신
-                stompClient.subscribe("/quiz/question/reception", function(message) {
-                    console.log(message);
+        // 새로운 문제 수신
+        stompClient.subscribe("/quiz/question/reception", function(message) {
+          console.log(message);
 
-                    var data = JSON.parse(message.body);
-                    $('#question').html(data.question);
-                });
+          var data = JSON.parse(message.body);
+          $('#question').html(data.question);
+        });
 
-                // 문제 종료
-                stompClient.subscribe("/quiz/question/close", function(message) {
-                    console.log(message);
-                });
-            }, function (error) {
-                console.log("STOMP protocol error " + error);
-            });
+        // 문제 종료
+        stompClient.subscribe("/quiz/question/close", function(message) {
+          console.log(message);
+        });
+      }, function (error) {
+        console.log("STOMP protocol error " + error);
+      });
 
-            $('#yes').click(function() {
-                stompClient.send('/quiz/answer', {}, JSON.stringify({answer: true}));
-            }).css('cursor', 'pointer');
-            $('#no').click(function() {
-                stompClient.send('/quiz/answer', {}, JSON.stringify({answer: false}));
-            }).css('cursor', 'pointer');
-        })();
-</script>
+      var lastAnswer = null;
 
+      $('#yes').click(function() {
+        if (lastAnswer !== true) {
+          stompClient.send('/quiz/answer', {}, JSON.stringify({answer: true}));
+          lastAnswer = true;
+          $('#yes').addClass('active');
+          $('#no').removeClass('active');
+        }
+      });
+      $('#no').click(function() {
+        if (lastAnswer !== false) {
+          stompClient.send('/quiz/answer', {}, JSON.stringify({answer: false}));
+          lastAnswer = false;
+          $('#no').addClass('active');
+          $('#yes').removeClass('active');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
