@@ -7,7 +7,7 @@
 <body>
 
   <header>
-    <h2 id="question">곧 문제가 출제됩니다. 잠시만 기다려주세요.</h2>
+    <h2 id="question">곧 문제가 출제됩니다.<br>잠시만 기다려주세요.</h2>
   </header>
 
   <div id="main">
@@ -44,8 +44,6 @@
   <script src="/resources/components/stomp-websocket/lib/stomp.js"></script>
   <script type="text/javascript">
     $(document).ready(function() {
-
-
       var yesArea$ = $('#yes-area'),
           noArea$ = $('#no-area'),
           yesAreaLeft = Math.ceil(yesArea$.offset().left),
@@ -78,6 +76,7 @@
       var totalPlayer = 0,
           waitCount = 0,
           yesCount = 0,
+          started = false;
           waiting$ = $('#waiting'),
           graph$ = $('#graph-yes'),
           waitingNum$ = $('#waitingNum'),
@@ -85,17 +84,20 @@
 
       function addPlayer(player) {
         totalPlayer++;
-        waitCount++;
-        waitingNum$.html(waitCount);
+        waitingNum$.html(++waitCount);
+
         waiting$.append(
           $('<img>').attr({src: '/resources/icons/' + getRandomAvatar() + '.gif', id:player.name}).addClass('player')
         );
       }
 
       function removePlayer(player) {
-        totalPlayer--;
         var p$ = $('#' + player.name);
-        if (p$.hasClass('answered')) { waitCount--; waitingNum$.html(waitCount);}
+
+        if (totalPlayer > 0) { totalPlayer--; }
+        if (!p$.hasClass('answered')) { waitingNum$.html(--waitCount);}
+        if (waitCount < 0) { waitingNum$.html(waitCount = 0);}
+
         $('#' + player.name).remove();
       }
 
@@ -104,11 +106,12 @@
         if (p$.length) {
           var fromWaiting = false;
           if (!p$.hasClass('answered')) {
-            waitCount--;
-            waitingNum$.html(waitCount);
-            p$.addClass('answered')
-              .offset(p$.offset());
             fromWaiting = true;
+            waitingNum$.html(--waitCount);
+            if (waitCount < 0) { waitingNum$.html(waitCount = 0);}
+
+            // top, bottom이 없어서 좌측,하단에서부터 이동하지 않도록 현재 위치 입력
+            p$.addClass('answered').offset(p$.offset());
           }
 
           if(player.lastAnswer === true) {
@@ -118,10 +121,11 @@
             if (!fromWaiting) { yesCount--; }
             p$.animate(getRandomPositionInNoArea());
           }
-        }
 
-        var yesPercentage = Math.round(yesCount / (totalPlayer - waitCount) * 100);
-        graph$.animate({width: yesPercentage + '%'});
+          // 그래프 변경
+          var yesPercentage = Math.round(yesCount / (totalPlayer - waitCount) * 100);
+          graph$.animate({width: yesPercentage + '%'});
+        }
       }
 
       // 웹소켓 연결
@@ -147,7 +151,6 @@
           console.log(message);
 
           addPlayer(JSON.parse(message.body));
-          //Player.in(JSON.parse(message.body));
         });
 
         // 플레이어 나감
@@ -155,21 +158,29 @@
           console.log(message);
 
           removePlayer(JSON.parse(message.body))
-          //Player.out(JSON.parse(message.body));
         });
 
         // 플레이어가 대답함
         stompClient.subscribe("/quiz/players/answer", function(message) {
           console.log(message);
 
-          moveToYesNoArea(JSON.parse(message.body));
-          //Player.move(JSON.parse(message.body));
+          if (started) {
+            moveToYesNoArea(JSON.parse(message.body));
+          }
         });
 
         // 새로운 문제 수신
         stompClient.subscribe("/quiz/question/reception", function(message) {
           console.log(message);
 
+          // 플레이어, 그래프 리셋
+          $('.player').removeClass('answered');
+          waitCount = totalPlayer = $('.player').length ;
+          waitingNum$.html(waitCount);
+          graph$.animate({width: '50%'});
+
+          // 문제 출력
+          started = true;
           var data = JSON.parse(message.body);
           question$.html(data.question);
         });
@@ -183,7 +194,7 @@
       });
     });
 
-    // prefetch images
+    // 아바타 이미지 미리 로딩
     /* icons from
        http://all-free-download.com/free-vector/vector-cartoon/pixel_art_of_the_cartoon_01_vector_180945.html
        http://all-free-download.com/free-vector/vector-cartoon/pixel_art_of_the_cartoon_02_vector_180944.html

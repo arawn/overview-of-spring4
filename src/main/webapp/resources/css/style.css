@@ -114,3 +114,26 @@ footer h3 {
 #answer .half {
   text-align: center;
 }
+
+.lightbox {
+  display: none;
+}
+.closed .lightbox {
+  display: block;
+  background-color: #000000;
+  opacity: .7;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  color: #ffffff;
+  text-align: center;
+  padding-top: 200px;
+}
+
+.closed .lightbox span {
+  color: #ffffff;
+  font-size: 5em;
+  opacity: 1;
+}

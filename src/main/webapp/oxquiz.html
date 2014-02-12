@@ -6,7 +6,7 @@
 </head>
 <body>
   <header>
-    <h2 id="question">곧 문제가 출제됩니다. 잠시만 기다려주세요.</h2>
+    <h2 id="question">곧 문제가 출제됩니다.<br>잠시만 기다려주세요.</h2>
   </header>
 
   <div id="main">
@@ -20,11 +20,23 @@
     </div>
   </div>
 
+  <div class='lightbox'>
+    <span>현재 문제는 종료되었습니다.</span>
+  </div>
+
   <script src="/resources/components/jquery/jquery.js"></script>
   <script src="/resources/components/sockjs/sockjs.js"></script>
   <script src="/resources/components/stomp-websocket/lib/stomp.js"></script>
   <script type="text/javascript">
     $(document).ready(function() {
+      var lastAnswer = null,
+          yes$ = $('#yes'),
+          no$ = $('#no'),
+          yesAndNo$ = $('#yes, #no'),
+          question$ = $('#question'),
+          body$ = $('body');
+
+      // 웹소켓 처리
       var socket = new SockJS('/join');
       var stompClient = Stomp.over(socket);
 
@@ -37,33 +49,40 @@
           console.log(message);
 
           var data = JSON.parse(message.body);
-          $('#question').html(data.question);
+          question$.html(data.question);
+
+          body$.removeClass('closed');
         });
 
         // 문제 종료
         stompClient.subscribe("/quiz/question/close", function(message) {
           console.log(message);
+
+          // 버튼을 초기화하고 화면을 가린다.
+          yesAndNo$.removeClass('active');
+          body$.addClass('closed');
         });
       }, function (error) {
         console.log("STOMP protocol error " + error);
       });
 
-      var lastAnswer = null;
-
-      $('#yes').click(function() {
+      // 이벤트 리스너
+      yes$.click(function() {
         if (lastAnswer !== true) {
           stompClient.send('/quiz/answer', {}, JSON.stringify({answer: true}));
+
           lastAnswer = true;
-          $('#yes').addClass('active');
-          $('#no').removeClass('active');
+          yes$.addClass('active');
+          no$.removeClass('active');
         }
       });
-      $('#no').click(function() {
+      no$.click(function() {
         if (lastAnswer !== false) {
           stompClient.send('/quiz/answer', {}, JSON.stringify({answer: false}));
+
           lastAnswer = false;
-          $('#no').addClass('active');
-          $('#yes').removeClass('active');
+          no$.addClass('active');
+          yes$.removeClass('active');
         }
       });
     });
