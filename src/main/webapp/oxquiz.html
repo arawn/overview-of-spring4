@@ -30,7 +30,6 @@
   <script type="text/javascript">
     $(document).ready(function() {
       var lastAnswer = null,
-          started = false;
           yes$ = $('#yes'),
           no$ = $('#no'),
           yesAndNo$ = $('#yes, #no'),
@@ -53,7 +52,6 @@
           question$.html(data.question);
 
           body$.removeClass('closed');
-          started = true;
         });
 
         // 문제 종료
@@ -70,7 +68,7 @@
 
       // 이벤트 리스너
       yes$.click(function() {
-        if (started && lastAnswer !== true) {
+        if (lastAnswer !== true) {
           stompClient.send('/quiz/answer', {}, JSON.stringify({answer: true}));
 
           lastAnswer = true;
@@ -79,7 +77,7 @@
         }
       });
       no$.click(function() {
-        if (started && lastAnswer !== false) {
+        if (lastAnswer !== false) {
           stompClient.send('/quiz/answer', {}, JSON.stringify({answer: false}));
 
           lastAnswer = false;

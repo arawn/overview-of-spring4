@@ -76,6 +76,7 @@
       var totalPlayer = 0,
           waitCount = 0,
           yesCount = 0,
+          started = false;
           waiting$ = $('#waiting'),
           graph$ = $('#graph-yes'),
           waitingNum$ = $('#waitingNum'),
@@ -163,7 +164,9 @@
         stompClient.subscribe("/quiz/players/answer", function(message) {
           console.log(message);
 
-          moveToYesNoArea(JSON.parse(message.body));
+          if (started) {
+            moveToYesNoArea(JSON.parse(message.body));
+          }
         });
 
         // 새로운 문제 수신
@@ -177,6 +180,7 @@
           graph$.animate({width: '50%'});
 
           // 문제 출력
+          started = true;
           var data = JSON.parse(message.body);
           question$.html(data.question);
         });
