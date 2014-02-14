@@ -11,7 +11,11 @@ Overview of Spring 4.0
 
 ### 실행방법
 
-* 저장소 복제(git close https://github.com/arawn/overview-of-spring4.git)
+* 저장소 복제(git clone https://github.com/arawn/overview-of-spring4.git)
 * bower install
 * gradlew tomcatWarRun
 * 브라우저로 http://localhost:8090 접속
+
+### 발표장표
+
+* [Overview of Spring4.pdf](docs/overview-of-spring4.pdf)
