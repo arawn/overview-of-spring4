@@ -12,6 +12,8 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 public class JSR310SupportTest {
 
@@ -35,7 +37,25 @@ public class JSR310SupportTest {
     }
 
     @Test
-    public void testJSR310() {
+    public void testJSR310API() {
+        LocalDate 오늘 = LocalDate.now();
+        LocalDate 삼일절  = LocalDate.of(2014, 3, 1);
+        LocalDate 현충일 = LocalDate.parse("2014-06-06");
+
+        LocalDate 어제 = 오늘.minusDays(1);
+        LocalDate 내일 = 오늘.plusDays(1);
+        LocalDate 일주일뒤 = 오늘.plusWeeks(1);
+
+
+        DateTimeFormatter style = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
+        String styleFormat = 오늘.format(style);
+
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        String patternFormat = 오늘.format(pattern);
+    }
+
+    @Test
+    public void testJSR310Converter() {
         TypeDescriptor targetType = TypeDescriptor.valueOf(String.class);
 
         PropertyAccessor propertyAccessor = PropertyAccessorFactory.forDirectFieldAccess(this);
