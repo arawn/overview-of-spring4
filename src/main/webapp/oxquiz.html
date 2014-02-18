@@ -48,8 +48,8 @@
         stompClient.subscribe("/quiz/question/reception", function(message) {
           console.log(message);
 
-          var data = JSON.parse(message.body);
-          question$.html(data.question);
+          var question = JSON.parse(message.body);
+          question$.html(question.content);
 
           body$.removeClass('closed');
         });

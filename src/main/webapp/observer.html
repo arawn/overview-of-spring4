@@ -181,8 +181,8 @@
 
           // 문제 출력
           started = true;
-          var data = JSON.parse(message.body);
-          question$.html(data.question);
+          var question = JSON.parse(message.body);
+          question$.html(question.content);
         });
 
         // 문제 종료

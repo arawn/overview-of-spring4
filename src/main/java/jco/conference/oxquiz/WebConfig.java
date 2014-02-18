@@ -3,7 +3,6 @@ package jco.conference.oxquiz;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.mvc.WebContentInterceptor;
@@ -12,9 +11,7 @@ import org.springframework.web.servlet.view.JstlView;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "jco.conference.oxquiz.web")
-@PropertySource("classpath:META-INF/properties/environment.xml")
-@PropertySource("classpath:META-INF/properties/environment.properties")
+@ComponentScan(basePackages = "jco.conference.oxquiz.handler")
 public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Override
@@ -26,6 +23,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("redirect:/oxquiz.html");
         registry.addViewController("/observer").setViewName("redirect:/observer.html");
+        registry.addViewController("/emcee").setViewName("/emcee");
     }
 
     @Override

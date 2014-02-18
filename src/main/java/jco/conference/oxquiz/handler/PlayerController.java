@@ -1,4 +1,4 @@
-package jco.conference.oxquiz.websocket;
+package jco.conference.oxquiz.handler;
 
 import jco.conference.oxquiz.model.Player;
 import jco.conference.oxquiz.model.repository.Repository;

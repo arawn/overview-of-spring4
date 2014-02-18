@@ -1,52 +1,46 @@
-package jco.conference.oxquiz.web;
+package jco.conference.oxquiz.handler;
 
-import jco.conference.oxquiz.model.Player;
-import jco.conference.oxquiz.model.repository.Repository;
+import jco.conference.oxquiz.model.Question;
+import jco.conference.oxquiz.model.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @Controller
-@RequestMapping("/emcee")
-public class EmceeController {
+public class QuestionController {
 
     private SimpMessageSendingOperations messagingTemplate;
-    private Repository<Player> playerRepository;
+    private QuestionRepository questionRepository;
 
     @Autowired
-    public EmceeController(SimpMessageSendingOperations messagingTemplate, Repository<Player> playerRepository) {
+    public QuestionController(SimpMessageSendingOperations messagingTemplate, QuestionRepository questionRepository) {
         this.messagingTemplate = messagingTemplate;
-        this.playerRepository = playerRepository;
+        this.questionRepository = questionRepository;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public String emcee(Model model) {
-        model.addAttribute("players", playerRepository.findAll());
-
-       return "/emcee";
+    @SubscribeMapping("/question/reception")
+    public Question reception() {
+        return questionRepository.findOneByLastCreatedDateTime();
     }
 
     @RequestMapping(value = "/question/send", method = RequestMethod.POST)
-    public ResponseEntity nextQuestion(String question) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("question", question);
+    public ResponseEntity next(Question question) {
+        questionRepository.save(question);
 
-        messagingTemplate.convertAndSend("/quiz/question/reception", payload);
+        messagingTemplate.convertAndSend("/quiz/question/reception", question);
 
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/question/close", method = RequestMethod.POST)
-    public ResponseEntity closeQuestion() {
+    public ResponseEntity close() {
         messagingTemplate.convertAndSend("/quiz/question/close", Collections.emptyMap());
 
         return new ResponseEntity(HttpStatus.OK);

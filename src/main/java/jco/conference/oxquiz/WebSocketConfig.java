@@ -1,8 +1,7 @@
 package jco.conference.oxquiz;
 
-import jco.conference.oxquiz.websocket.PlayersEventSender;
+import jco.conference.oxquiz.handler.PlayersEventSender;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.SubscribableChannel;
@@ -15,7 +14,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler;
 
 @Configuration
-@ComponentScan(basePackages = "jco.conference.oxquiz.websocket")
 public class WebSocketConfig extends WebSocketMessageBrokerConfigurationSupport {
 
     @Override

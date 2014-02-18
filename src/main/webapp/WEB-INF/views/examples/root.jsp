@@ -6,8 +6,13 @@
     <title>Overview of Spring 4.0 :: Examples</title>
 </head>
 <body>
-<h1>Overview of Spring 4.0 :: Examples</h1>
+<h3>Environment</h3>
+<ul>
+    <li>AppName : <sf:eval expression="@environment.getProperty('appName')"/></li>
+    <li>AppVersion : <sf:eval expression="@environment.getProperty('appVersion')"/></li>
+</ul>
 <hr/>
+<h3>Examples</h3>
 <ul>
     <li><a href='<sf:url value="/example/websocket"/>'>WebSocket</a></li>
     <li><a href='<sf:url value="/example/websocket/sockjs"/>'>WebSocket with SockJS Fallback</a></li>
