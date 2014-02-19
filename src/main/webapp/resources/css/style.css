@@ -13,20 +13,25 @@ header {
 }
 
 header h2 {
-  font-size: 5em;
+  font-size: 4em;
   color: #27B8DB;
   margin-top: 10px;
+  margin-bottom: 0;
 }
 
 #yes, #no {
-  width: 100px;
-  height: 100px;
-  border-radius: 50px;
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  -o-border-radius: 30px;
+  -ms-border-radius: 30px;
   display: inline-block;
   color: #ffffff;
   text-align: center;
-  line-height: 115px;
-  font-size: 4em;
+  line-height: 68px;
+  font-size: 25px;
 }
 
 #yes {
@@ -55,9 +60,9 @@ header h2 {
 }
 
 #graph {
-  height: 50px;
+  height: 40px;
   background: #D86969;
-  margin-bottom: 10px;
+  margin-bottom: 1px;
 }
 
 #graph-yes {
@@ -99,10 +104,14 @@ footer h3 {
   width: 90%;
   height: 40%;
   border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -o-border-radius: 50px;
+  -ms-border-radius: 50px;
   padding-top: 40%;
   cursor: pointer;
+  font-size: 120px;
 }
-
 
 #answer #yes:active,
 #answer #yes.active {
@@ -115,6 +124,10 @@ footer h3 {
 }
 #answer .half {
   text-align: center;
+}
+
+#answer #question {
+  min-height: 20%;
 }
 
 .lightbox {
@@ -142,12 +155,12 @@ footer h3 {
 }
 
 #question {
-  min-height: 170px;
+  min-height: 100px;
 }
 
 .percentage {
   position: absolute;
-  line-height: 50px;
+  line-height: 40px;
   color: #ffffff;
   font-size: 22px;
   font-weight: 700;
