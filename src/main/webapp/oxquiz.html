@@ -60,6 +60,7 @@
         stompClient.subscribe("/quiz/question/close", function(message) {
           console.log(message);
 
+          lastAnswer = null;
           setTimeout(function() {
             closeQuestion('현재 문제는 종료되었습니다.');
           }, 6000);
