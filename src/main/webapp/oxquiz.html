@@ -6,7 +6,7 @@
 </head>
 <body>
   <header>
-    <h2 id="question">곧 문제가 출제됩니다.<br>잠시만 기다려주세요.</h2>
+    <h2 id="question"></h2>
   </header>
 
   <div id="main">
@@ -21,7 +21,7 @@
   </div>
 
   <div class='lightbox'>
-    <span>현재 문제는 종료되었습니다.</span>
+    <span></span>
   </div>
 
   <script src="/resources/components/jquery/jquery.js"></script>
@@ -34,7 +34,14 @@
           no$ = $('#no'),
           yesAndNo$ = $('#yes, #no'),
           question$ = $('#question'),
-          body$ = $('body');
+          body$ = $('body'),
+          lightbox$ = $('.lightbox');
+
+      var closeQuestion = function(msg) {
+        yesAndNo$.removeClass('active');
+        lightbox$.find('span').html(msg);
+        body$.addClass('closed');
+      };
 
       // 웹소켓 처리
       var socket = new SockJS('/join');
@@ -58,9 +65,7 @@
         stompClient.subscribe("/quiz/question/close", function(message) {
           console.log(message);
 
-          // 버튼을 초기화하고 화면을 가린다.
-          yesAndNo$.removeClass('active');
-          body$.addClass('closed');
+          closeQuestion('현재 문제는 종료되었습니다.');
         });
       }, function (error) {
         console.log("STOMP protocol error " + error);
@@ -85,6 +90,8 @@
           yes$.removeClass('active');
         }
       });
+
+      closeQuestion('아직 문제 출제 전입니다.<br>잠시 기다리시면 곧 시작됩니다.');
     });
   </script>
 </body>
