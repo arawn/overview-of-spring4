@@ -2,6 +2,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <title>Overview of Spring 4.0 :: OXQuiz</title>
+  <link rel="stylesheet" href="/resources/flipclock/flipclock.css">
   <link rel="stylesheet" type="text/css" href='/resources/css/style.css'/>
 </head>
 <body>
@@ -11,27 +12,19 @@
   </header>
 
   <div id="main">
-    <div id="label">
-      <div class="half">
-        <div id="yes">YES</div>
-      </div>
-      <div class="half">
-        <div id="no">NO</div>
-      </div>
-    </div>
-    <div id="playground">
-      <div class="half">
-        <div id="yes-area"></div>
-      </div>
-      <div class="half">
-        <div id="no-area"></div>
-      </div>
-    </div>
     <div id="graph">
+      <div class="percentage yes">50%</div>
+      <div class="percentage no">50%</div>
       <span id="graph-yes"></span>
     </div>
+    <div id="label">
+      <div class="half"><div id="yes">YES</div></div><div class="half"><div id="no">NO</div></div>
+    </div>
+    <div id="playground">
+      <div class="half"><div id="yes-area"></div></div><div class="half"><div id="no-area"></div></div>
+    </div>
     <footer>
-      <h3>답변 대기중인 사람들(<span id="waitingNum">0</span>) : </h3>
+      <h3>답변 대기중(<span id="waitingNum">0</span>) : </h3>
       <div id="waiting">
       </div>
     </footer>
@@ -39,7 +32,9 @@
 
   <div id="preloadedImages"></div>
 
+
   <script src="/resources/components/jquery/jquery.js"></script>
+  <script src="/resources/flipclock/flipclock.min.js"></script>
   <script src="/resources/components/sockjs/sockjs.js"></script>
   <script src="/resources/components/stomp-websocket/lib/stomp.js"></script>
   <script type="text/javascript">
@@ -72,6 +67,30 @@
       function getRandomAvatar() {
         return Math.floor(Math.random() * (120)) + 1;
       }
+
+      var counter = $('<div>').attr('id', 'counter');
+      var startCountdown = function(callback) {
+        var ct$ = $(counter).clone().appendTo($('body'));
+        console.log(ct$);
+
+        var clock = ct$.FlipClock(5, {
+          countdown: true,
+          clockFace: 'Counter'
+        });
+
+        ct$.show();
+        setTimeout(function() {
+          var interval = setInterval(function() {
+            clock.decrement();
+
+            if (clock.getTime().time < 0) {
+              callback();
+              clearInterval(interval);
+              ct$.remove();
+            }
+          }, 1000);
+        }, 500);
+      };
 
       var totalPlayer = 0,
           waitCount = 0,
@@ -123,8 +142,10 @@
           }
 
           // 그래프 변경
-          var yesPercentage = Math.round(yesCount / (totalPlayer - waitCount) * 100);
-          graph$.animate({width: yesPercentage + '%'});
+          var yesPercentage = Math.round(yesCount / (totalPlayer - waitCount) * 1000) / 10;
+          graph$.animate({width: yesPercentage + '%'})
+              .siblings('.yes').html(yesPercentage + '%').end()
+              .siblings('.no').html(100 - yesPercentage + '%');
         }
       }
 
@@ -176,8 +197,11 @@
           // 플레이어, 그래프 리셋
           $('.player').removeClass('answered');
           waitCount = totalPlayer = $('.player').length ;
+          yesCount = 0;
           waitingNum$.html(waitCount);
-          graph$.animate({width: '50%'});
+          graph$.animate({width: '50%'})
+              .siblings('.yes').html('50%').end()
+              .siblings('.no').html('50%');
 
           // 문제 출력
           started = true;
@@ -188,6 +212,10 @@
         // 문제 종료
         stompClient.subscribe("/quiz/question/close", function(message) {
           console.log(message);
+
+          startCountdown(function() {
+            started = false;
+          });
         });
       }, function (error) {
           console.log("STOMP protocol error " + error);

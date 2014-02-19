@@ -13,22 +13,26 @@ header {
 }
 
 header h2 {
-  font-size: 5em;
+  font-size: 4em;
   color: #27B8DB;
   margin-top: 10px;
+  margin-bottom: 0;
 }
 
 #yes, #no {
-  width: 200px;
-  height: 200px;
-  border-radius: 100px;
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  -o-border-radius: 30px;
+  -ms-border-radius: 30px;
   display: inline-block;
   color: #ffffff;
   text-align: center;
-  line-height: 215px;
-  font-size: 6em;
+  line-height: 68px;
+  font-size: 25px;
 }
-
 
 #yes {
   background: #73CC65;
@@ -39,7 +43,7 @@ header h2 {
 }
 
 .half {
-  width: 48%;
+  width: 50%;
   display: inline-block;
 }
 
@@ -56,8 +60,9 @@ header h2 {
 }
 
 #graph {
-  height: 100px;
+  height: 40px;
   background: #D86969;
+  margin-bottom: 1px;
 }
 
 #graph-yes {
@@ -70,6 +75,8 @@ header h2 {
 footer {
   clear: both;
   margin-top: 10px;
+  border-top: 2px solid #333333;
+  padding-top: 5px;
 }
 
 footer h3 {
@@ -97,10 +104,14 @@ footer h3 {
   width: 90%;
   height: 40%;
   border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -o-border-radius: 50px;
+  -ms-border-radius: 50px;
   padding-top: 40%;
   cursor: pointer;
+  font-size: 120px;
 }
-
 
 #answer #yes:active,
 #answer #yes.active {
@@ -115,13 +126,18 @@ footer h3 {
   text-align: center;
 }
 
+#answer #question {
+  min-height: 20%;
+}
+
 .lightbox {
   display: none;
 }
+
 .closed .lightbox {
   display: block;
   background-color: #000000;
-  opacity: .7;
+  opacity: .8;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -136,4 +152,31 @@ footer h3 {
   color: #ffffff;
   font-size: 5em;
   opacity: 1;
+}
+
+#question {
+  min-height: 100px;
+}
+
+.percentage {
+  position: absolute;
+  line-height: 40px;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+}
+.percentage.yes {
+  left: 5px;
+}
+.percentage.no {
+  right: 0;
+}
+
+#counter {
+  position: absolute;
+  top: 300px;
+  left: 50%;
+  margin-left: -100px;
+  z-index: 100;
+  display: none;
 }
