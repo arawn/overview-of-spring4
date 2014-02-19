@@ -2,6 +2,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <title>Overview of Spring 4.0 :: OXQuiz</title>
+  <link rel="stylesheet" href="/resources/flipclock/flipclock.css">
   <link rel="stylesheet" type="text/css" href='/resources/css/style.css'/>
 </head>
 <body>
@@ -31,7 +32,9 @@
 
   <div id="preloadedImages"></div>
 
+
   <script src="/resources/components/jquery/jquery.js"></script>
+  <script src="/resources/flipclock/flipclock.min.js"></script>
   <script src="/resources/components/sockjs/sockjs.js"></script>
   <script src="/resources/components/stomp-websocket/lib/stomp.js"></script>
   <script type="text/javascript">
@@ -64,6 +67,31 @@
       function getRandomAvatar() {
         return Math.floor(Math.random() * (120)) + 1;
       }
+
+      var counter = $('<div>').attr('id', 'counter');
+      var startCountdown = function(callback) {
+        var ct$ = $(counter).clone().appendTo($('body'));
+        console.log(ct$);
+
+        var clock = ct$.FlipClock(5, {
+          countdown: true,
+          clockFace: 'Counter'
+        });
+
+        ct$.show();
+        setTimeout(function() {
+          var interval = setInterval(function() {
+            clock.decrement();
+
+            console.log(clock.getTime().time)
+            if (clock.getTime().time < 0) {
+              callback();
+              clearInterval(interval);
+              ct$.remove();
+            }
+          }, 1000);
+        }, 500);
+      };
 
       var totalPlayer = 0,
           waitCount = 0,
@@ -182,6 +210,10 @@
         // 문제 종료
         stompClient.subscribe("/quiz/question/close", function(message) {
           console.log(message);
+
+          startCountdown(function() {
+            started = false;
+          });
         });
       }, function (error) {
           console.log("STOMP protocol error " + error);
