@@ -19,16 +19,15 @@ header h2 {
 }
 
 #yes, #no {
-  width: 200px;
-  height: 200px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50px;
   display: inline-block;
   color: #ffffff;
   text-align: center;
-  line-height: 215px;
-  font-size: 6em;
+  line-height: 115px;
+  font-size: 4em;
 }
-
 
 #yes {
   background: #73CC65;
@@ -39,7 +38,7 @@ header h2 {
 }
 
 .half {
-  width: 48%;
+  width: 50%;
   display: inline-block;
 }
 
@@ -56,8 +55,9 @@ header h2 {
 }
 
 #graph {
-  height: 100px;
+  height: 50px;
   background: #D86969;
+  margin-bottom: 10px;
 }
 
 #graph-yes {
@@ -70,6 +70,8 @@ header h2 {
 footer {
   clear: both;
   margin-top: 10px;
+  border-top: 2px solid #333333;
+  padding-top: 5px;
 }
 
 footer h3 {
