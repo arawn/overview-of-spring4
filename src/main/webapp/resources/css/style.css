@@ -144,3 +144,17 @@ footer h3 {
 #question {
   min-height: 170px;
 }
+
+.percentage {
+  position: absolute;
+  line-height: 50px;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+}
+.percentage.yes {
+  left: 5px;
+}
+.percentage.no {
+  right: 0;
+}

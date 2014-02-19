@@ -12,6 +12,8 @@
 
   <div id="main">
     <div id="graph">
+      <div class="percentage yes">50%</div>
+      <div class="percentage no">50%</div>
       <span id="graph-yes"></span>
     </div>
     <div id="label">
@@ -114,7 +116,9 @@
 
           // 그래프 변경
           var yesPercentage = Math.round(yesCount / (totalPlayer - waitCount) * 100);
-          graph$.animate({width: yesPercentage + '%'});
+          graph$.animate({width: yesPercentage + '%'})
+              .siblings('.yes').html(yesPercentage + '%').end()
+              .siblings('.no').html(100 - yesPercentage + '%');
         }
       }
 
