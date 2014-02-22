@@ -18,4 +18,4 @@ Overview of Spring 4.0
 
 ### - 발표장표
 
-* [Overview of Spring4.pdf - 작성 중](https://github.com/arawn/overview-of-spring4/blob/master/docs/overview-of-spring4.pdf?raw=true)
+* [Overview of Spring4.pdf](https://github.com/arawn/overview-of-spring4/blob/master/docs/overview-of-spring4.pdf?raw=true)
